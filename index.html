@@ -60,6 +60,7 @@ h1{cursor:pointer;margin:0;font-size:1.75rem;font-weight:800;letter-spacing:-.02
   <div class="grid" id="grid"></div>
   <p class="hint" id="hint"></p>
 </main>
+<script data-goatcounter="https://stardays.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script>
 (function(){
   var KEY='stardays.v1', marks={}, canSave=true;
@@ -68,6 +69,7 @@ h1{cursor:pointer;margin:0;font-size:1.75rem;font-weight:800;letter-spacing:-.02
   var now=new Date(), view={y:now.getFullYear(), m:now.getMonth()};
   var STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.9L12 17.8 5.8 21.1 7 14.2 2 9.3l6.9-1z"/></svg>';
   var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function track(name){var n=0;(function go(){try{if(window.goatcounter&&window.goatcounter.count){window.goatcounter.count({path:name,title:name,event:true});}else if(n++<20){setTimeout(go,300);}}catch(e){}})();}
   function key(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
   function todayKey(){var t=new Date();return key(t.getFullYear(),t.getMonth(),t.getDate());}
   function save(){try{localStorage.setItem(KEY,JSON.stringify(marks));}catch(e){canSave=false;}}
@@ -96,18 +98,19 @@ h1{cursor:pointer;margin:0;font-size:1.75rem;font-weight:800;letter-spacing:-.02
     
     var hint=document.getElementById('hint');
     if(!canSave) hint.textContent='This browser can\u2019t save your stars, so they will reset when you close the page.';
-    else if(!Object.keys(marks).length) hint.textContent='Tap any day to add a star. Tap again to remove it. Your stars stay on this device, no account needed.';
-    else hint.textContent='Your stars stay on this device, no account needed.';
+    else if(!Object.keys(marks).length) hint.textContent='Tap any day to add a star. Tap again to remove it. Your stars stay on this device, no account needed. Anonymous visit counts only.';
+    else hint.textContent='Your stars stay on this device, no account needed. Anonymous visit counts only.';
   }
   document.getElementById('grid').addEventListener('click',function(e){
     var b=e.target.closest('.cell[data-k]'); if(!b) return;
-    var k=b.getAttribute('data-k'); toggle(k); render(marks[k]?k:null);
+    var k=b.getAttribute('data-k'); toggle(k); if(marks[k]) track('star-added'); render(marks[k]?k:null);
     if(e.detail===0){var nb=document.querySelector('.cell[data-k="'+k+'"]'); if(nb) nb.focus({preventScroll:true});}
   });
   function goToday(){var t=new Date(); view={y:t.getFullYear(),m:t.getMonth()}; render();}
   var ttl=document.getElementById('title'); ttl.addEventListener('click',goToday); ttl.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault(); goToday();}});
   document.getElementById('prev').addEventListener('click',function(){view.m--; if(view.m<0){view.m=11;view.y--;} render();});
   document.getElementById('next').addEventListener('click',function(){view.m++; if(view.m>11){view.m=0;view.y++;} render();});
+  try{var seen=localStorage.getItem('stardays.seen'), td=todayKey(); if(seen&&seen!==td) track('return-visit'); localStorage.setItem('stardays.seen',td);}catch(e){}
   render();
 })();
 </script>
